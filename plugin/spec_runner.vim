@@ -11,12 +11,15 @@ end
 
 if !exists('g:spec_runners')
   let g:spec_runners = {
+    \ "vim": {
+    \   "command": "vimspec"
+    \ },
     \ "ruby": {
     \   "command": "rspec {file}",
     \   "can_run_line": 1
     \ },
     \ "coffee": {
-    \   "command": "mocha --compilers coffee:coffee-script --reporter spec {file}"
+    \   "command": "mocha --debug --compilers coffee:coffee-script --reporter spec {file}"
     \ }
     \}
 
@@ -36,8 +39,8 @@ end
 
 " Public Functions {{{1
 func! RunSpecFile()
-  if (has_key(g:spec_runners, &filetype))
-    let cmd = g:spec_runners[&filetype]['command']
+  let cmd = s:GetSpecCommand()
+  if (cmd != '')
     call s:RunSpecCommand(cmd)
   end
 endfunc
@@ -52,6 +55,16 @@ func! RunSpecLine()
 endfunc
 
 " Private Functions {{{1
+func! s:GetSpecCommand()
+  if exists('g:override_spec_runner') && g:override_spec_runner != ''
+    return g:override_spec_runner
+  elseif (has_key(g:spec_runners, &filetype))
+    return g:spec_runners[&filetype]['command']
+  else
+    return ''
+  end
+endfunc
+
 func! s:CanRunSpecLine()
   if (has_key(g:spec_runners, &filetype))
     let runner = g:spec_runners[&filetype]
