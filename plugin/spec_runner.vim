@@ -5,8 +5,11 @@
 " ============================================================================
 
 " Variables {{{1
-if !exists('g:spec_runner_use_vimux')
-  let g:spec_runner_use_vimux = 0
+if !exists('g:spec_runner_mode')
+  let g:spec_runner_mode = 'normal'
+  " available options:
+  " - vimux => uses vimux
+  " - second-tmux => uses a secondary tmux session called "test-output"
 end
 
 if !exists('g:spec_runners')
@@ -73,10 +76,19 @@ func! s:CanRunSpecLine()
   return 0
 endfunc
 
+func! s:SendToSecondTmux(command)
+  exec "silent !tmux send-keys -t test-output \"" . a:command . "\" Enter"
+endfunc
+
 func! s:RunSpecCommand(command)
   let cmd = substitute(a:command, '{file}', s:GetCurrentFileName(), 'g')
-  if (g:spec_runner_use_vimux)
+  if (g:spec_runner_mode == 'vimux')
     call VimuxRunCommand("clear\n" . cmd)
+  elseif (g:spec_runner_mode == 'second-tmux')
+    call s:SendToSecondTmux("clear")
+    call s:SendToSecondTmux("cd " . getcwd())
+    call s:SendToSecondTmux(cmd)
+    redraw!
   else
     exec "!" . cmd
   end
