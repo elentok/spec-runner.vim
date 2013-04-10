@@ -13,6 +13,7 @@ if !exists('g:spec_runner_mode')
 end
 
 let g:spec_runner_last_command = ''
+let g:spec_runner_extra_args = ''
 
 if !exists('g:spec_runners')
   let g:spec_runners = {
@@ -85,6 +86,9 @@ endfunc
 func! s:RunSpecCommand(command)
   let cmd = substitute(a:command, '{file}', s:GetCurrentFileName(), 'g')
   let g:spec_runner_last_command = cmd
+  if (g:spec_runner_extra_args != '')
+    let cmd .= ' ' . g:spec_runner_extra_args
+  end
   if (g:spec_runner_mode == 'vimux')
     call VimuxRunCommand("clear\n" . cmd)
   elseif (g:spec_runner_mode == 'second-tmux')
@@ -111,5 +115,7 @@ endfunc
 map \r :call RunSpecLine()<cr>
 map \R :call RunSpecFile()<cr>
 map \\ :call RunLastSpec()<cr>
+
+command! -nargs=* SpecArgs let g:spec_runner_extra_args="<args>"
 
 " vim: foldmethod=marker

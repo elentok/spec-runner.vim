@@ -17,6 +17,13 @@ but it supports two more modes using the `g:spec_runner_mode` variable.
     tmux new-session -s test-output
     ```
 
+Extra Args
+----------
+
+To add extra arguments to the spec command (like `--grep 'pattern'` in mocha tests) use one of the following:
+
+* `:let g:spec_runner_extra_args="--grep mypattern"`
+* `:SpecArgs --grep mypattern`
 
 Key mappings
 ------------
