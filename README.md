@@ -6,11 +6,17 @@ Automatically runs specs from vim.
 Settings
 --------
 
-* to use Vimux, add this line to your .vimrc:
+By default, spec-runner will run the tests in the current process,
+but it supports two more modes using the `g:spec_runner_mode` variable.
 
-```vim
-let g:spec_runner_use_vimux = 1
-```
+* `"vimux"` - use vimux 
+* `"second-tmux"` - use a secondary tmux (so you can run your tests on a second monitor).
+  * to use this mode, open a new terminal and run:
+  
+    ```
+    tmux new-session -s test-output
+    ```
+
 
 Key mappings
 ------------
