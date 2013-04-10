@@ -12,6 +12,8 @@ if !exists('g:spec_runner_mode')
   " - second-tmux => uses a secondary tmux session called "test-output"
 end
 
+let g:spec_runner_last_command = ''
+
 if !exists('g:spec_runners')
   let g:spec_runners = {
     \ "vim": {
@@ -77,18 +79,18 @@ func! s:CanRunSpecLine()
 endfunc
 
 func! s:SendToSecondTmux(command)
-  exec "silent !tmux send-keys -t test-output \"" . a:command . "\" Enter"
+  call system("tmux send-keys -t test-output \"" . a:command . "\" Enter")
 endfunc
 
 func! s:RunSpecCommand(command)
   let cmd = substitute(a:command, '{file}', s:GetCurrentFileName(), 'g')
+  let g:spec_runner_last_command = cmd
   if (g:spec_runner_mode == 'vimux')
     call VimuxRunCommand("clear\n" . cmd)
   elseif (g:spec_runner_mode == 'second-tmux')
     call s:SendToSecondTmux("clear")
     call s:SendToSecondTmux("cd " . getcwd())
     call s:SendToSecondTmux(cmd)
-    redraw!
   else
     exec "!" . cmd
   end
@@ -98,9 +100,16 @@ func! s:GetCurrentFileName()
   return substitute(expand('%'), '^./', '', '')
 endfunc
 
+func! RunLastSpec()
+  if (g:spec_runner_last_command != '')
+    call s:RunSpecCommand(g:spec_runner_last_command)
+  end
+endfunc
+
+
 " Key mapping {{{1
 map \r :call RunSpecLine()<cr>
 map \R :call RunSpecFile()<cr>
-map \\ :VimuxRunLastCommand<cr>
+map \\ :call RunLastSpec()<cr>
 
 " vim: foldmethod=marker
