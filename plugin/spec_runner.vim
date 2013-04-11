@@ -18,7 +18,7 @@ if !exists('g:spec_runners')
     \   "can_run_line": 1
     \ },
     \ "coffee": {
-    \   "command": "mocha --debug --compilers coffee:coffee-script --reporter spec {file}"
+    \   "command": "mocha --compilers coffee:coffee-script --reporter spec {file}"
     \ }
     \}
 
