@@ -148,6 +148,7 @@ nnoremap <Leader>tl :call RunSpecLine()<cr>
 nnoremap <Leader>tf :call RunSpecFile()<cr>
 nnoremap <Leader>tt :call RunLastSpec()<cr>
 
-command! -nargs=* SpecArgs let g:spec_runner_extra_args="<args>"
+command! -nargs=* SpecArgs call SetSpecArgs("<args>")
+command! -nargs=* ClearSpecArgs call ClearSpecArgs()
 
 " vim: foldmethod=marker
