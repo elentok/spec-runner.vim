@@ -5,15 +5,8 @@
 " ============================================================================
 
 " Variables {{{1
-if !exists('g:spec_runner_mode')
-  let g:spec_runner_mode = 'normal'
-  " available options:
-  " - vimux => uses vimux
-  " - second-tmux => uses a secondary tmux session called "test-output"
-end
-
 let g:spec_runner_last_command = ''
-let g:spec_runner_extra_args = ''
+let g:spec_runner_second_tmux_session = 'test-output'
 
 if !exists('g:spec_runners')
   let g:spec_runners = {
@@ -79,29 +72,47 @@ func! s:CanRunSpecLine()
   return 0
 endfunc
 
-func! s:SendToSecondTmux(command)
-  call system("tmux send-keys -t test-output \"" . a:command . "\" Enter")
+func! s:RunSpecCommand(command)
+  let cmd = s:ProcessCommand(a:command)
+
+  if s:IsSecondTmuxOpen()
+    call s:RunWithSecondTmux(cmd)
+  elseif IsInTmux()
+    call s:RunWithVimux(cmd)
+  else
+    call "!" . cmd
+  end
 endfunc
 
-func! s:RunSpecCommand(command)
+func! s:ProcessCommand(command)
   let cmd = substitute(a:command, '{file}', s:GetCurrentFileName(), 'g')
+  if ((cmd != g:spec_runner_last_command) && exists('b:spec_runner_extra_args'))
+    let cmd .= ' ' . b:spec_runner_extra_args
+  end
   let g:spec_runner_last_command = cmd
-  if (g:spec_runner_extra_args != '')
-    let cmd .= ' ' . g:spec_runner_extra_args
-  end
-  if (g:spec_runner_mode == 'vimux')
-    call VimuxRunCommand("clear\n" . cmd)
-  elseif (g:spec_runner_mode == 'second-tmux')
-    call s:SendToSecondTmux("clear")
-    call s:SendToSecondTmux("cd " . getcwd())
-    call s:SendToSecondTmux(cmd)
-  else
-    exec "!" . cmd
-  end
+  return cmd
 endfunc
 
 func! s:GetCurrentFileName()
   return substitute(expand('%'), '^./', '', '')
+endfunc
+
+func! IsInTmux()
+  return $TMUX != ""
+endfunc
+
+func! s:RunWithVimux(command)
+  call VimuxRunCommand("clear\n" . a:command)
+endfunc
+
+func! s:RunWithSecondTmux(command)
+  call s:SendToSecondTmux("clear")
+  call s:SendToSecondTmux("cd " . getcwd())
+  call s:SendToSecondTmux(a:command)
+endfunc
+
+func! s:SendToSecondTmux(command)
+  call system("tmux send-keys -t " . g:spec_runner_second_tmux_session . " \"" . a:command . "\" Enter")
 endfunc
 
 func! RunLastSpec()
@@ -110,6 +121,27 @@ func! RunLastSpec()
   end
 endfunc
 
+func! SetSpecArgs(args)
+  if (a:args == "")
+    if exists("b:spec_runner_extra_args")
+      echo "Current spec args: [" . b:spec_runner_extra_args . "]"
+    else
+      echo "No spec args defined"
+    endif
+  else
+    let b:spec_runner_extra_args = a:args
+  endif
+endfunc
+
+func! s:IsSecondTmuxOpen()
+  return system("tmux ls -F '#{session_name}' | grep '^" . g:spec_runner_second_tmux_session . "$'") != ""
+endfunc
+
+func! ClearSpecArgs()
+  if exists("b:spec_runner_extra_args")
+    unlet b:spec_runner_extra_args
+  end
+endfunc
 
 " Key mapping {{{1
 map \r :call RunSpecLine()<cr>

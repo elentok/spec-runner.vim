@@ -3,19 +3,15 @@ Spec-Runner.vim
 
 Automatically runs specs from vim.
 
-Settings
---------
 
-By default, spec-runner will run the tests in the current process,
-but it supports two more modes using the `g:spec_runner_mode` variable.
+How does spec-runner choose where to run the tests?
+------------------------------------------------------
 
-* `"vimux"` - use vimux 
-* `"second-tmux"` - use a secondary tmux (so you can run your tests on a second monitor).
-  * to use this mode, open a new terminal and run:
-  
-    ```
-    tmux new-session -s test-output
-    ```
+1. If there's a tmux session named "test-output" it will run the test in its first window.
+2. Else, if we're inside a tmux session it will run using Vimux.
+3. Else, it will run in the current process (using "!")
+
+You can change the name of the second tmux session using the variable `g:spec_runner_second_tmux_session`
 
 Extra Args
 ----------
