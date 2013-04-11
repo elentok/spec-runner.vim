@@ -24,7 +24,7 @@ To add extra arguments to the spec command (like `--grep 'pattern'` in mocha tes
 Key mappings
 ------------
 
-* \r - run current spec (current line)
-* \R - run entire spec file
-* \\ - run last spec command (currently only supported when using vimux)
+* <Leader>tl - run current spec (current line)
+* <Leader>tf - run entire spec file
+* <Leader>tt - run last spec command
 

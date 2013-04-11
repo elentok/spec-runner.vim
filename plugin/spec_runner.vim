@@ -144,9 +144,9 @@ func! ClearSpecArgs()
 endfunc
 
 " Key mapping {{{1
-map \r :call RunSpecLine()<cr>
-map \R :call RunSpecFile()<cr>
-map \\ :call RunLastSpec()<cr>
+nnoremap <Leader>tl :call RunSpecLine()<cr>
+nnoremap <Leader>tf :call RunSpecFile()<cr>
+nnoremap <Leader>tt :call RunLastSpec()<cr>
 
 command! -nargs=* SpecArgs let g:spec_runner_extra_args="<args>"
 
