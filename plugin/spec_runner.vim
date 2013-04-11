@@ -40,14 +40,14 @@ end
 func! RunSpecFile()
   let cmd = s:GetSpecCommand()
   if (cmd != '')
-    call s:RunSpecCommand(cmd)
+    call s:RunSpecCommand(cmd, 1)
   end
 endfunc
 
 func! RunSpecLine()
   if (s:CanRunSpecLine())
     let cmd = g:spec_runners[&filetype]['command'] . ":" . line('.')
-    call s:RunSpecCommand(cmd)
+    call s:RunSpecCommand(cmd, 1)
   else
     call RunSpecFile()
   end
@@ -72,8 +72,8 @@ func! s:CanRunSpecLine()
   return 0
 endfunc
 
-func! s:RunSpecCommand(command)
-  let cmd = s:ProcessCommand(a:command)
+func! s:RunSpecCommand(command, add_extra_args)
+  let cmd = s:ProcessCommand(a:command, a:add_extra_args)
 
   if s:IsSecondTmuxOpen()
     call s:RunWithSecondTmux(cmd)
@@ -84,9 +84,9 @@ func! s:RunSpecCommand(command)
   end
 endfunc
 
-func! s:ProcessCommand(command)
+func! s:ProcessCommand(command, add_extra_args)
   let cmd = substitute(a:command, '{file}', s:GetCurrentFileName(), 'g')
-  if ((cmd != g:spec_runner_last_command) && exists('b:spec_runner_extra_args'))
+  if (a:add_extra_args && exists('b:spec_runner_extra_args'))
     let cmd .= ' ' . b:spec_runner_extra_args
   end
   let g:spec_runner_last_command = cmd
@@ -117,7 +117,7 @@ endfunc
 
 func! RunLastSpec()
   if (g:spec_runner_last_command != '')
-    call s:RunSpecCommand(g:spec_runner_last_command)
+    call s:RunSpecCommand(g:spec_runner_last_command, 0)
   end
 endfunc
 
