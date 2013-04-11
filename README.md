@@ -24,7 +24,7 @@ To add extra arguments to the spec command (like `--grep 'pattern'` in mocha tes
 Key mappings
 ------------
 
-* <Leader>tl - run current spec (current line)
-* <Leader>tf - run entire spec file
-* <Leader>tt - run last spec command
+* &lt;Leader&gt;tl - run current spec (current line)
+* &lt;Leader&gt;tf - run entire spec file
+* &lt;Leader&gt;tt - run last spec command
 
