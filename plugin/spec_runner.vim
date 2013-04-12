@@ -8,16 +8,13 @@
 let g:spec_runner_last_command = ''
 let g:spec_runner_second_tmux_session = 'test-output'
 
-let g:spec_runner_root = expand("<sfile>:p:h") . "/../"
-let g:spec_runner_bin = "python " . g:spec_runner_root . "spec_runner.py"
-
 " Public Functions {{{1
 func! RunSpecFile()
-  call s:RunSpec('all', 'add-extra-args')
+  call s:RunSpec(-1)
 endfunc
 
 func! RunSpecLine()
-  call s:RunSpec(line('.'), 'add-extra-args')
+  call s:RunSpec(line('.'))
 endfunc
 
 func! RunLastSpec()
@@ -28,21 +25,20 @@ endfunc
 
 
 " Private Functions {{{1
-func! s:RunSpec(line, add_extra_args)
-  let cmd = s:GetSpecCommand(a:line, a:add_extra_args)
-  let g:spec_runner_last_command = cmd
-  call s:RunSpecCommand(cmd)
+func! s:RunSpec(line)
+  let cmd = GetSpecCommand(a:line)
+  if cmd != ''
+    let g:spec_runner_last_command = cmd
+    call s:RunSpecCommand(cmd)
+  end
 endfunc
 
-func! s:GetSpecCommand(line, add_extra_args)
-  let cmd = g:spec_runner_bin . " " . s:GetCurrentFileName()
-  if a:line != 'all'
-    let cmd .= ' ' . a:line
+func! GetSpecCommand(line)
+  if exists("b:spec_func")
+    return {b:spec_func}(s:GetCurrentFileName(), a:line)
+  else
+    return ''
   end
-  if (a:add_extra_args && exists('b:spec_runner_extra_args'))
-    let cmd .= ' ' . b:spec_runner_extra_args
-  end
-  return cmd
 endfunc
 
 func! s:GetCurrentFileName()
@@ -64,12 +60,15 @@ func! IsInTmux()
 endfunc
 
 func! s:RunWithVimux(command)
-  call VimuxRunCommand("cd " . getcwd() . "\n" . a:command)
+  call VimuxRunCommand("cd " . getcwd() . "; clear")
+  call VimuxClearRunnerHistory()
+  call VimuxRunCommand(a:command)
 endfunc
 
 func! s:RunWithSecondTmux(command)
-  call s:SendToSecondTmux("clear")
   call s:SendToSecondTmux("cd " . getcwd())
+  call s:SendToSecondTmux("clear")
+  call s:SendToSecondTmux("tmux clear-history")
   call s:SendToSecondTmux(a:command)
 endfunc
 
