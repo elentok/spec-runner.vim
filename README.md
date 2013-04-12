@@ -16,10 +16,10 @@ You can change the name of the second tmux session using the variable `g:spec_ru
 Extra Args
 ----------
 
-To add extra arguments to the spec command (like `--grep 'pattern'` in mocha tests) use one of the following:
+To add extra arguments to the spec command use one of the following:
 
-* `:let g:spec_runner_extra_args="--grep mypattern"`
-* `:SpecArgs --grep mypattern`
+* `:let g:spec_runner_extra_args="..."`
+* `:SpecArgs ...`
 
 Key mappings
 ------------

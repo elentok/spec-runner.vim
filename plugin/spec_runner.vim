@@ -8,88 +8,40 @@
 let g:spec_runner_last_command = ''
 let g:spec_runner_second_tmux_session = 'test-output'
 
-if !exists('g:spec_runners')
-  let g:spec_runners = {
-    \ "vim": {
-    \   "command": "vimspec"
-    \ },
-    \ "ruby": {
-    \   "command": "rspec {file}",
-    \   "can_run_line": 1
-    \ },
-    \ "coffee": {
-    \   "command": "mocha --compilers coffee:coffee-script --reporter spec {file}"
-    \ }
-    \}
-
-  if exists('g:user_spec_runners')
-    for type in keys(g:user_spec_runners)
-      let runner = g:user_spec_runners[type]
-      if has_key(g:spec_runners, type)
-        for key in keys(runner)
-          let g:spec_runners[type][key] = runner[key]
-        endfor
-      else
-        let g:spec_runners[type] = runner
-      end
-    endfor
-  end
-end
+let g:spec_runner_root = expand("<sfile>:p:h") . "/../"
+let g:spec_runner_bin = "python " . g:spec_runner_root . "spec_runner.py"
 
 " Public Functions {{{1
 func! RunSpecFile()
-  let cmd = s:GetSpecCommand()
-  if (cmd != '')
-    call s:RunSpecCommand(cmd, 1)
-  end
+  call s:RunSpec('all', 'add-extra-args')
 endfunc
 
 func! RunSpecLine()
-  if (s:CanRunSpecLine())
-    let cmd = g:spec_runners[&filetype]['command'] . ":" . line('.')
-    call s:RunSpecCommand(cmd, 1)
-  else
-    call RunSpecFile()
+  call s:RunSpec(line('.'), 'add-extra-args')
+endfunc
+
+func! RunLastSpec()
+  if (g:spec_runner_last_command != '')
+    call s:RunSpecCommand(g:spec_runner_last_command)
   end
 endfunc
+
 
 " Private Functions {{{1
-func! s:GetSpecCommand()
-  if exists('g:override_spec_runner') && g:override_spec_runner != ''
-    return g:override_spec_runner
-  elseif (has_key(g:spec_runners, &filetype))
-    return g:spec_runners[&filetype]['command']
-  else
-    return ''
-  end
+func! s:RunSpec(line, add_extra_args)
+  let cmd = s:GetSpecCommand(a:line, a:add_extra_args)
+  let g:spec_runner_last_command = cmd
+  call s:RunSpecCommand(cmd)
 endfunc
 
-func! s:CanRunSpecLine()
-  if (has_key(g:spec_runners, &filetype))
-    let runner = g:spec_runners[&filetype]
-    return (has_key(runner, 'can_run_line') && runner['can_run_line'])
+func! s:GetSpecCommand(line, add_extra_args)
+  let cmd = g:spec_runner_bin . " " . s:GetCurrentFileName()
+  if a:line != 'all'
+    let cmd .= ' ' . a:line
   end
-  return 0
-endfunc
-
-func! s:RunSpecCommand(command, add_extra_args)
-  let cmd = s:ProcessCommand(a:command, a:add_extra_args)
-
-  if s:IsSecondTmuxOpen()
-    call s:RunWithSecondTmux(cmd)
-  elseif IsInTmux()
-    call s:RunWithVimux(cmd)
-  else
-    call "!" . cmd
-  end
-endfunc
-
-func! s:ProcessCommand(command, add_extra_args)
-  let cmd = substitute(a:command, '{file}', s:GetCurrentFileName(), 'g')
   if (a:add_extra_args && exists('b:spec_runner_extra_args'))
     let cmd .= ' ' . b:spec_runner_extra_args
   end
-  let g:spec_runner_last_command = cmd
   return cmd
 endfunc
 
@@ -97,12 +49,22 @@ func! s:GetCurrentFileName()
   return substitute(expand('%'), '^./', '', '')
 endfunc
 
+func! s:RunSpecCommand(cmd)
+  if s:IsSecondTmuxOpen()
+    call s:RunWithSecondTmux(a:cmd)
+  elseif IsInTmux()
+    call s:RunWithVimux(a:cmd)
+  else
+    call "!" . a:cmd
+  end
+endfunc
+
 func! IsInTmux()
   return $TMUX != ""
 endfunc
 
 func! s:RunWithVimux(command)
-  call VimuxRunCommand("clear\n" . a:command)
+  call VimuxRunCommand("cd " . getcwd() . "\n" . a:command)
 endfunc
 
 func! s:RunWithSecondTmux(command)
@@ -113,12 +75,6 @@ endfunc
 
 func! s:SendToSecondTmux(command)
   call system("tmux send-keys -t " . g:spec_runner_second_tmux_session . " \"" . a:command . "\" Enter")
-endfunc
-
-func! RunLastSpec()
-  if (g:spec_runner_last_command != '')
-    call s:RunSpecCommand(g:spec_runner_last_command, 0)
-  end
 endfunc
 
 func! SetSpecArgs(args)
