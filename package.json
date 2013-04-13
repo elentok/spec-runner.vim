@@ -30,6 +30,7 @@
   "dependencies": {
   },
   "devDependencies": {
+    "coffee-script": "1.6.x",
     "vimspec": "0.0.x"
   }
 }
