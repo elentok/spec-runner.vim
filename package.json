@@ -1,0 +1,35 @@
+{
+  "name": "spec-runner",
+  "description": "vim spec runner plugin",
+  "version": "0.1.0",
+  "homepage": "https://github.com/elentok/spec-runner.vim",
+  "author": {
+    "name": "David Elentok",
+    "email": "3david@gmail.com",
+    "url": "http://www.elentok.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/elentok/spec-runner.vim.git"
+  },
+  "bugs": {
+    "url": "https://github.com/elentok/spec-runner.vim/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/elentok/spec-runner.vim/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/vimspec"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "vimspec": "0.0.x"
+  }
+}
