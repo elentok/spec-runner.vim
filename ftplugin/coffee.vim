@@ -18,6 +18,8 @@ func! coffee#get_mocha_grep()
   else
     let grep = join(contexts, ' ')
     let grep = substitute(grep, "'", "''", 'g')
+    let grep = substitute(grep, '(', '\\(', 'g')
+    let grep = substitute(grep, ')', '\\)', 'g')
     return " --grep '" . grep . "'"
   end
 endfunc

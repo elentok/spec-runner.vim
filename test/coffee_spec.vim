@@ -7,6 +7,7 @@ function! Test_get_mocha_grep()
   call s:Test_get_mocha_grep(7, ' --grep ''one two three''')
   call s:Test_get_mocha_grep(8, ' --grep ''one two three four''')
   call s:Test_get_mocha_grep(9, " --grep 'one two three fi''ve'")
+  call s:Test_get_mocha_grep(10, " --grep 'one two three alpha\\(bravo\\)'")
 endfunc
 
 function! s:Test_get_mocha_grep(line_number, expected)
