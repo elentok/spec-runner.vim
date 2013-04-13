@@ -1,6 +1,8 @@
 Spec-Runner.vim
 ===============
 
+[![Build Status](https://travis-ci.org/elentok/spec-runner.vim.png?branch=master)](https://travis-ci.org/elentok/spec-runner.vim)
+
 Automatically runs specs from vim.
 
 
