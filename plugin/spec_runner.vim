@@ -99,9 +99,9 @@ func! ClearSpecArgs()
 endfunc
 
 " Key mapping {{{1
-nnoremap <Leader>tl :call RunSpecLine()<cr>
-nnoremap <Leader>tf :call RunSpecFile()<cr>
-nnoremap <Leader>tt :call RunLastSpec()<cr>
+nnoremap <Leader>tl :w<cr>:call RunSpecLine()<cr>
+nnoremap <Leader>tf :w<cr>:call RunSpecFile()<cr>
+nnoremap <Leader>tt :w<cr>:call RunLastSpec()<cr>
 
 command! -nargs=* SpecArgs call SetSpecArgs("<args>")
 command! -nargs=* ClearSpecArgs call ClearSpecArgs()
