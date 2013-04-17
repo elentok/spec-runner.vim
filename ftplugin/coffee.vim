@@ -1,15 +1,52 @@
 func! coffee#spec(file, line)
+  if g:coffee_spec_mode == 'server'
+    return coffee#spec_server(a:file, a:line)
+  else
+    return coffee#spec_client(a:file, a:line)
+  end
+endfunc
+
+func! coffee#spec_server(file, line)
   let command = "mocha --compilers coffee:coffee-script --reporter spec"
   let command .= " " . a:file
   if a:line > 0
-    let command .= coffee#get_mocha_grep()
+    let grep = coffee#get_mocha_grep()
+    if grep != ''
+      let command .= " --grep '" . grep . "'"
+    end
   end
   return command
+endfunc
+
+func! coffee#spec_client(file, line)
+  let command = "mocha-phantomjs 'public/test.html"
+  if a:line > 0
+    let grep = coffee#get_mocha_grep()
+    if grep != ''
+      let command .= "?grep=" . grep
+    end
+  end
+  return command . "'"
 endfunc
 
 if !exists("b:spec_func")
   let b:spec_func = "coffee#spec"
 end
+
+if !exists("g:coffee_spec_mode")
+  let g:coffee_spec_mode = 'server'
+end
+
+func! coffee#toggle_spec_mode()
+  if g:coffee_spec_mode == 'server'
+    let g:coffee_spec_mode = 'client'
+  else
+    let g:coffee_spec_mode = 'server'
+  end
+  echo "Set coffee spec mode to '" . g:coffee_spec_mode ."'"
+endfunc
+
+command! CoffeeSpecMode call coffee#toggle_spec_mode()
 
 func! coffee#get_mocha_grep()
   let contexts = coffee#get_mocha_contexts()
@@ -20,7 +57,7 @@ func! coffee#get_mocha_grep()
     let grep = substitute(grep, "'", "''", 'g')
     let grep = substitute(grep, '(', '\\(', 'g')
     let grep = substitute(grep, ')', '\\)', 'g')
-    return " --grep '" . grep . "'"
+    return grep
   end
 endfunc
 
