@@ -2,12 +2,12 @@ source ftplugin/coffee.vim
 
 function! Test_get_mocha_grep()
   call s:Test_get_mocha_grep(1, '')
-  call s:Test_get_mocha_grep(2, ' --grep ''one''')
-  call s:Test_get_mocha_grep(3, ' --grep ''one two''')
-  call s:Test_get_mocha_grep(7, ' --grep ''one two three''')
-  call s:Test_get_mocha_grep(8, ' --grep ''one two three four''')
-  call s:Test_get_mocha_grep(9, " --grep 'one two three fi''ve'")
-  call s:Test_get_mocha_grep(10, " --grep 'one two three alpha\\(bravo\\)'")
+  call s:Test_get_mocha_grep(2, "one")
+  call s:Test_get_mocha_grep(3, "one two")
+  call s:Test_get_mocha_grep(7, 'one two three')
+  call s:Test_get_mocha_grep(8, 'one two three four')
+  call s:Test_get_mocha_grep(9, "one two three fi''ve")
+  call s:Test_get_mocha_grep(10, "one two three alpha\\(bravo\\)")
 endfunc
 
 function! s:Test_get_mocha_grep(line_number, expected)
