@@ -1,5 +1,5 @@
 func! GetRubySpecCommand(file, line)
-  if file_readable('zeus.json')
+  if !empty(glob('.zeus.sock'))
     let command = "zeus rspec "
   else
     let command = "rspec "
