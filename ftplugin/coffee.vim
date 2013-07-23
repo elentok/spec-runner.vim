@@ -7,7 +7,8 @@ func! coffee#spec(file, line)
 endfunc
 
 func! coffee#spec_server(file, line)
-  let command = "mocha --compilers coffee:coffee-script --reporter spec"
+  let command = coffee#get_mocha_bin()
+  let command .= " --compilers coffee:coffee-script --reporter spec"
   let command .= " " . a:file
   if a:line > 0
     let grep = coffee#get_mocha_grep()
@@ -16,6 +17,14 @@ func! coffee#spec_server(file, line)
     end
   end
   return command
+endfunc
+
+func! coffee#get_mocha_bin()
+  if filereadable('node_modules/.bin/mocha')
+    return 'node_modules/.bin/mocha'
+  else
+    return 'mocha'
+  end
 endfunc
 
 func! coffee#spec_client(file, line)
