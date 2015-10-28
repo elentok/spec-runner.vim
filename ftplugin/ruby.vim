@@ -1,8 +1,8 @@
 func! GetRubySpecCommand(file, line)
   if !empty(glob('.zeus.sock'))
     let command = 'zeus rspec '
-  elseif executable('bin/rspec')
-    let command = 'bin/rspec '
+  elseif executable('./bin/rspec')
+    let command = './bin/rspec '
   else
     let command = 'rspec '
   end
